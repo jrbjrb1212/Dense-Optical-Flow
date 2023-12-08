@@ -1,0 +1,3 @@
+- Different videos with the three algorithms applied
+- Vary parameters of each algorithm
+- Timing comparison between C++ and Python3
