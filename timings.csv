@@ -1,0 +1,10 @@
+'Video_Path', 'Algorithm', 'Time'
+videos/khaled.mp4,lucaskanade_dense,8.969589948654175
+videos/beach_people.mp4,lucaskanade_dense,86.01669263839722
+videos/dutch_traffic.mp4,lucaskanade_dense,114.92154431343079
+videos/dutch_traffic.mp4,farneback,163.20672845840454
+videos/khaled.mp4,farneback,14.897222518920898
+videos/beach_people.mp4,farneback,147.9391975402832
+videos/dutch_traffic.mp4,rlof,217.38064408302307
+videos/khaled.mp4,rlof,21.44838047027588
+videos/beach_people.mp4,rlof,191.54016637802124

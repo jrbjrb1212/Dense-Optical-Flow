@@ -2,11 +2,15 @@ import numpy as np
 import cv2
 import sys
 import argparse
+import time
+import csv
+
 
 
 def dense_optical_flow(method, video_path, output_path, params=[], to_gray=False):
     cap = cv2.VideoCapture(video_path)
     total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    print(f"Total Frames: {total_frames}")
     ret, old_frame = cap.read()
     frames_itered = 1
     next_ten = .1
@@ -25,7 +29,6 @@ def dense_optical_flow(method, video_path, output_path, params=[], to_gray=False
         old_frame = cv2.cvtColor(old_frame, cv2.COLOR_BGR2GRAY)
     while True:
         frames_itered+=1
-        print(f"frames_itered: {frames_itered}")
         if frames_itered / total_frames > next_ten:
             print(f"Finished {next_ten * 100}% of frames")
             next_ten += 0.1
@@ -74,17 +77,28 @@ def main():
         type=str,
         help="sum the integers (default: find the max)",
     )
+    parser.add_argument(
+        "--timing",
+        type=bool,
+        help="sum the integers (default: find the max)",
+    )
+
+
     args = parser.parse_args()
     algorithm = args.algorithm
     video_path = args.video_path
-    method = None
+    timing_enabled = args.timing
 
+    method = None
+    timings = []
+
+    tic = time.time()
     if algorithm == "lucaskanade_dense":
         method = cv2.optflow.calcOpticalFlowSparseToDense
         frames = dense_optical_flow(
             method,
             video_path,
-            video_path.replace(".mp4", "") + "_out.mp4",
+            f'{video_path.replace(".mp4", "")}_{algorithm}_out.mp4',
             [],
             to_gray=True,
         )
@@ -106,12 +120,20 @@ def main():
             poly_sigma,
             flags,
         ]  # default Farneback's algorithm parameters
-        frames = dense_optical_flow(method, video_path, params, to_gray=True)
+        frames = dense_optical_flow(method, video_path, f'{video_path.replace(".mp4", "")}_{algorithm}_out.mp4', params, to_gray=True)
     elif algorithm == "rlof":
         method = cv2.optflow.calcOpticalFlowDenseRLOF
-        frames = dense_optical_flow(method, video_path, [], to_gray=False)
+        frames = dense_optical_flow(method, video_path, f'{video_path.replace(".mp4", "")}_{algorithm}_out.mp4', [], to_gray=False)
     else:
         print("Algorithm not found")
+    toc = time.time()
+    elapsed_time = toc - tic
+
+    if timing_enabled:
+        timings.append([video_path, algorithm, elapsed_time])
+        with open('timings.csv', mode='a', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerows(timings)
 
 
 if __name__ == "__main__":
