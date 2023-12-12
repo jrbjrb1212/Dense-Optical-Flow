@@ -52,7 +52,7 @@ def main():
     base_video_path = args.video_name
     video_names = ["base", "farneback", "lucas_kanade", "rlof"]
 
-    combine_videos(base_video_path, "videos/test_w_text.mp4", video_names)
+    combine_videos(base_video_path, "videos/test_w_text.mp4v", video_names)
 
 if __name__ == "__main__":
     main()
