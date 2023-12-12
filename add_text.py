@@ -1,43 +1,32 @@
-import cv2
-import numpy as np
-import argparse
+from moviepy.editor import VideoFileClip, TextClip, CompositeVideoClip
 
-def combine_videos(video_path: str, output_video_name: str, video_names: list):
-    # Open the video capture object
-    cap = cv2.VideoCapture(video_path)
 
-    # Get video properties (assuming all videos have the same properties)
-    width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-    height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-    fps = int(cap.get(cv2.CAP_PROP_FPS))
+def add_text_to_video_segments(input_video, output_video, video_names):
+    # Load the video clip
+    clip = VideoFileClip(input_video)
 
-    # Create a video writer object
-    combined_video = cv2.VideoWriter(output_video_name, cv2.VideoWriter_fourcc(*'mp4v'), fps, (width * 2, height * 2))
+    # Calculate dimensions of each segment
+    width, height = clip.size
+    segment_width = width // 2
+    segment_height = height // 2
 
-    while True:
-        ret, frame = cap.read()
-        if not ret:
-            break
+    # Create text clips for each segment
+    text_clips = []
+    for i, name in enumerate(video_names):
+        text = TextClip(name, fontsize=30, color="white")
+        text = text.set_position(("left", "top")).set_duration(clip.duration)
+        text = text.set_start((i % 2) * segment_width, (i // 2) * segment_height)
+        text_clips.append(text)
 
-        frame = cv2.resize(frame, (width // 2, height // 2))
+    # Composite text clips on the video
+    composite_texts = CompositeVideoClip(text_clips)
+    result = CompositeVideoClip([clip, composite_texts])
 
-        # Define positions for text
-        positions = [
-            (0, 0),                     # Top-left
-            (width // 2, 0),            # Top-right
-            (0, height // 2),           # Bottom-left
-            (width // 2, height // 2)   # Bottom-right
-        ]
+    # Save the result
+    result.write_videofile(output_video, codec="libx264", fps=clip.fps)
 
-        try:
-            for i, pos in enumerate(positions):
-                text = f"{video_names[i]}"  # Modify this text as needed
-                x, y = pos
-                frame_with_text = cv2.putText(frame.copy(), text, (x + 10, y + 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
-                combined_video.write(frame_with_text)
-        except:
-            continue
 
+<<<<<<< HEAD
     # Release capture object
     cap.release()
 
@@ -56,3 +45,10 @@ def main():
 
 if __name__ == "__main__":
     main()
+=======
+# Usage
+video_names = ["base", "farneback", "lucas_kanade", "rlof"]
+add_text_to_video_segments(
+    "videos/test.mp4", "videos/test_w_text.mp4", video_names
+)
+>>>>>>> 4eb6166 (timing analysis)
